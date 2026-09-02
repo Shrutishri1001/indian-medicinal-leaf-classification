@@ -193,8 +193,3 @@ jupyter notebook cv-final.ipynb
 └── leaderboard_sorted.csv     # Ranked leaderboard sorted by Macro F1-score
 ```
 
----
-
-<div align="center">
-  <sub>Built with ❤️ for Computer Vision & Species Identification Research</sub>
-</div>
