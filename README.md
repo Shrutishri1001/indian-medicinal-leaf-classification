@@ -19,8 +19,7 @@
 [Pipeline Architecture](#-pipeline-architecture) •
 [Feature Extraction](#-feature-extraction-167-dimensions) •
 [Installation & Quick Start](#-installation--quick-start) •
-[Benchmark Leaderboard](#-benchmark-leaderboard) •
-[Citation & Acknowledgments](#-citation--acknowledgments)
+[Benchmark Leaderboard](#-benchmark-leaderboard)
 
 </div>
 
@@ -193,27 +192,6 @@ jupyter notebook cv-final.ipynb
 ├── all_combo_results.csv      # Complete metrics log for all 155 benchmark runs
 └── leaderboard_sorted.csv     # Ranked leaderboard sorted by Macro F1-score
 ```
-
----
-
-## 📜 Citation & Acknowledgments
-
-If you find this benchmark dataset analysis or pipeline useful for your research or coursework, please cite or reference this repository:
-
-```bibtex
-@misc{indian_medicinal_leaves_benchmark_2026,
-  author = {Parvathy Krishnaa},
-  title = {Indian Medicinal Leaves — Multi-Feature Computer Vision Benchmark},
-  year = {2026},
-  publisher = {GitHub},
-  journal = {GitHub Repository},
-  howpublished = {\url{https://github.com/your-username/indian-medicinal-leaves-benchmark}}
-}
-```
-
-### Dataset Attribution
-* **Dataset Creator**: Arya Shah ([Kaggle Dataset Link](https://www.kaggle.com/datasets/aryashah2k/indian-medicinal-leaves-dataset))
-* **Dataset Name**: Indian Medicinal Leaves Image Datasets (80 Classes)
 
 ---
 
