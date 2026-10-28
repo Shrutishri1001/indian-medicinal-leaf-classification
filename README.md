@@ -16,6 +16,7 @@
 </p>
 
 [Key Results](#-key-results) •
+[Deep Learning Case Study](#-deep-learning-case-study) •
 [Pipeline Architecture](#-pipeline-architecture) •
 [Feature Extraction](#-feature-extraction-167-dimensions) •
 [Installation & Quick Start](#-installation--quick-start) •
@@ -29,7 +30,12 @@
 
 Botanical species identification through leaf image analysis poses significant computer vision challenges due to subtle inter-class variations and high intra-class variations in leaf geometry, pigmentation, micro-texture, and venation.
 
-This repository presents a **comprehensive 155-run benchmark evaluation** comparing 5 machine learning classifiers across all $2^5 - 1 = 31$ possible non-empty combinations of 5 domain-specific Computer Vision feature extraction families:
+This repository contains two complementary approaches to Indian medicinal leaf classification:
+
+* A **155-run classical computer-vision benchmark** comparing 5 machine learning classifiers across all $2^5 - 1 = 31$ possible non-empty combinations of 5 domain-specific feature extraction families.
+* A **GoogLeNet (Inception-v1) transfer-learning case study** implemented in `medicinalplant_DL.ipynb`, with reproducible data splits, two-phase fine-tuning, explainability, and detailed test metrics.
+
+The classical benchmark uses these feature extraction families:
 
 1. 📐 **Shape Geometry & Hu Invariant Moments** (14 dims)
 2. 🎨 **HSV Color Histograms & Color Moments** (57 dims)
@@ -124,6 +130,48 @@ Feature extraction targets 5 distinct domain properties of leaf imagery:
 
 ---
 
+## 🧠 Deep Learning Case Study
+
+[`medicinalplant_DL.ipynb`](./medicinalplant_DL.ipynb) trains an ImageNet-pretrained **GoogLeNet / Inception-v1** classifier on the same Indian Medicinal Leaves dataset. The notebook is designed as a complete case study, from dataset inspection through error analysis and saved model artifacts.
+
+### Workflow
+
+1. **Dataset indexing and EDA**: discovers the Kaggle dataset, encodes the 80 folder-based classes, checks class imbalance and image dimensions, and creates a stratified 70/15/15 train/validation/test split.
+2. **Pre-processing and augmentation**: resizes images to 224 × 224, applies ImageNet normalization, and uses random crops, horizontal/vertical flips, rotation, and mild color jitter only for training images.
+3. **Transfer learning**: replaces GoogLeNet's classifier with `Dropout(0.4) → Linear(1024, 80)`. The model has approximately 5.68 million parameters after the new head is added.
+4. **Training and tuning**: compares a frozen-backbone stage with full fine-tuning, uses AdamW, label smoothing, early stopping, checkpoint restoration, and optional eight-configuration hyper-parameter tuning.
+5. **Evaluation**: reports accuracy, top-3 accuracy, macro/weighted precision, recall and F1, one-vs-rest macro ROC-AUC, per-class scores, a confusion matrix, a bootstrap confidence interval, and calibration metrics.
+6. **Interpretability and diagnosis**: generates Grad-CAM/feature-map visualizations, embedding-space plots, misclassified examples, and the most-confused class pairs.
+
+### Reported notebook results
+
+The following values are from the executed notebook output using the test split of 1,035 images:
+
+| Metric | GoogLeNet result |
+| :--- | :---: |
+| Test accuracy | **95.85%** |
+| 95% bootstrap confidence interval | **94.45%–96.90%** |
+| Top-3 accuracy | **99.61%** |
+| Macro F1-score | **0.9568** |
+| Macro ROC-AUC | **0.9997** |
+| Misclassified test images | **43 / 1,035 (4.15%)** |
+
+Fine-tuning improved validation accuracy from **60.68%** with the frozen backbone to **96.62%** after full fine-tuning. The notebook also reports the weakest classes (`Sapota`, `Nerale`, and `Tulsi`) and the most-confused pairs to support the performance discussion.
+
+### Generated artifacts
+
+When run, the notebook writes plots and reports to `/kaggle/working` on Kaggle or `./outputs` locally, including:
+
+* `01_class_distribution.png`, `02_sample_images.png`, and `03_augmentation.png`
+* training curves and hyper-parameter effect plots
+* confusion matrix, ROC/calibration, Grad-CAM, feature-map, embedding, and error-analysis figures
+* `googlenet_final_model.pth` and `googlenet_results.csv`
+
+> [!NOTE]
+> The notebook was executed with a GPU and mixed-precision enabled. CPU execution is supported by the code but will be substantially slower; set `RUN_TUNING = False` to skip the optional tuning sweep.
+
+---
+
 ## 💡 Technical Insights & Discussion
 
 > [!NOTE]
@@ -162,6 +210,17 @@ jupyter notebook cv-final.ipynb
 > [!NOTE]
 > Feature extraction automatically utilizes Python `multiprocessing.Pool` across all available CPU cores.
 
+### 4. Run the Deep Learning Notebook
+
+The deep-learning notebook requires PyTorch and torchvision in addition to the packages in `requirements.txt`:
+
+```bash
+pip install torch torchvision
+jupyter notebook medicinalplant_DL.ipynb
+```
+
+For Kaggle, attach the `aryashah2k/indian-medicinal-leaves-dataset` dataset and select a GPU accelerator before running the notebook. The notebook automatically searches the standard Kaggle dataset paths; update `DATASET_ROOT` in the setup cell if the dataset is mounted elsewhere.
+
 ---
 
 ## 📊 Benchmark Leaderboard (Top 10 Configurations)
@@ -186,10 +245,10 @@ jupyter notebook cv-final.ipynb
 ```
 .
 ├── cv-final.ipynb             # Complete Jupyter Notebook with code, logs & reports
+├── medicinalplant_DL.ipynb    # GoogLeNet transfer-learning case study
 ├── README.md                  # Comprehensive GitHub repository documentation
 ├── requirements.txt           # Python dependency requirements
 ├── all_features_raw.csv       # Saved 169-column feature matrix (6,900 x 169)
 ├── all_combo_results.csv      # Complete metrics log for all 155 benchmark runs
 └── leaderboard_sorted.csv     # Ranked leaderboard sorted by Macro F1-score
 ```
-
